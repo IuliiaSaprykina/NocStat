@@ -1,7 +1,2 @@
-*node_modules/*
-__pycache__
-.idea
+**node_modules
 .vscode
-env/
-log.txt
-requirements.txt
