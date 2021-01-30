@@ -12,34 +12,38 @@ app.use(bodyParser.json());
 module.exports = knex(config)
 
 const createPatient = (request, response) => {
-    response.json({patient: 1})
-    //this should look somthing similar, try to play with it
-//     const { email, password, first_name, last_name, address, phone_number, care_level, patient_type, age, gender } = request.body
-    
-//     database("patients")
-//     .select()
-//     .where({ email })
-//     .first()
-//     .then(patients => {
-//         if (!patients) {
-//             return bcrypt.hash(password, 12)
-//                 .then(hashedPassword => {
-//                     return database("patients").insert({
-//                         email, password_digest: hashedPassword, first_name, last_name, address, phone_number, care_level, patient_type, age, gender 
-//                     }).returning("*")
-//                 })
-//                 .then(patients => {
-//                     const secret = "HERESYOURTOKEN"
-//                     jwt.sign(users[0], secret, (error, token) => {
-//                     response.json({ token, patient: patients[0] })
-//                     })
-//                 })
-//         }
-//             response.send("Please choose another username")
-//     })
-    
+       const { patient } = request.body 
+       bcrypt.hash(patient.password, 12)
+        .then(hashedPassword => {
+            return database("patients")
+            .insert({
+                id: patient.id,
+                email: patient.email, 
+                password_hash: hashedPassword, 
+                // first_name: patient.first_name, 
+                // last_name: patient.last_name, 
+                // address: patient.address, 
+                // phone_number: patient.phone_number, 
+                // care_level: patient.care_level, 
+                // patient_type: patient.patient_type, 
+                // age: patient.age, 
+                // gender: patient.gender,
+                // account_img: patient.account_img,
+                // patient_img: patient.patient_img         
+            }).returning("*")
+        }).then(patients => {
+            const patient = patients[0]
+
+            response.json({ patient })
+            }).catch(error => {
+                response.json({ error: error.message })
+            })
 }
 
+
+const createPatientAccount = (request, response) => {
+    
+}
 
 
 const getAllPatients = (request, response) => {
@@ -56,9 +60,30 @@ const getAllCareGivers = (request, response) => {
     })
 }
 
+const loginPatient = (request, response) => {
+    const { patient } = request.body
+    database("patients")
+        .select()
+        .where({ email: patient.email })
+        .first()
+        .then(retrievePatient => {
+            if (!retrievePatient.id) throw new Error("No user")
+            
+            return bcrypt.compare(patient.password, retrievePatient.password_hash)
+        }).then(arePasswordsSame => {
+            if (!arePasswordsSame) throw new Error("Wrong password")
+
+            response.json({ message: "It's a match"})
+        }).catch(error => {
+            response.json(error.message)
+        })
+
+}
+
 app.get('/care_givers', getAllCareGivers)
 app.get('/patients', getAllPatients)
 app.post('/patients', createPatient)
-
+app.post('/acc_patients', createPatientAccount)
+app.post('/patient_login', loginPatient)
 
 app.listen(3000)
