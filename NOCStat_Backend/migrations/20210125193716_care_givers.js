@@ -1,7 +1,7 @@
 
 exports.up = function(knex) {
     return knex.schema.createTable("care_givers", table => {
-        table.increments()
+        table.integer("id")
         table.string("email")
         table.text("account_img")
         table.string("password_digest")

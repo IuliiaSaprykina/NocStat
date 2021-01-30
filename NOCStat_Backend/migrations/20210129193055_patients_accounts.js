@@ -1,19 +1,17 @@
-
 exports.up = function(knex) {
-    return knex.schema.createTable("patients", table => {
+    return knex.schema.createTable("patients_accounts", table => {
         table.increments()
-        table.string("email")
-        table.string("password_hash")
-        // table.string("first_name")
-        // table.string("last_name")
-        // table.text("account_img")
-        // table.text("patient_img")
-        // table.string("address")
-        // table.string("phone_number")
-        // table.string("care_level")
-        // table.string("patient_type")
-        // table.integer("age")
-        // table.string("gender")
+        table.references('id').inTable('patients');
+        table.string("first_name")
+        table.string("last_name")
+        table.text("account_img")
+        table.text("patient_img")
+        table.string("address")
+        table.string("phone_number")
+        table.string("care_level")
+        table.string("patient_type")
+        table.integer("age")
+        table.string("gender")
     })
 };
 
@@ -36,5 +34,5 @@ exports.up = function(knex) {
 // }
 
 exports.down = function(knex) {
-    return knex.schema.dropTableIfExists("patients")
+    return knex.schema.dropTableIfExists("patients_accounts")
 };
